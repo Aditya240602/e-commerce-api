@@ -15,11 +15,13 @@ import { User } from './models/user.js';
 const app=express();
 import fs from 'fs'
 import { Product } from './models/Products.js';
+import CheckOut from './utils/checkout.js';
 
 app.use('/pages', express.static(path.resolve(__dirname, './pages')));
 
 
 await connectDB();
+
 
 app.post('/checkout',
     express.urlencoded({ extended: false }),
@@ -49,8 +51,8 @@ app.post('/checkout',
     ,
     function (req, res) {
         try {
-            let buyerandreciverInfo=giveReciverData(req);
-            let shippingProdData=giveProductData(req);
+            let buyerandreciverInfo=CheckOut.giveReciverData(req); 
+            let shippingProdData=CheckOut.giveProductData(req);
 
             let order=new Orders({
                 ...shippingProdData,
@@ -68,66 +70,39 @@ app.post('/checkout',
 );
 
 
-
-function giveReciverData(req) {
-    let { fname, lname, email, number, country, city, district, road_no, zipcode, notes } = req.body;
-    if (validate.isAllNotEmty([fname, lname, email, number, country, city, district, road_no, zipcode, notes]) === false) namedErrorCatching('perameter error', 'their are some perameters are emty');
-    if (!validate.isNum(Number(number))) namedErrorCatching('perameter error', 'number is not a Number');
-    if (!validate.isNum(Number(zipcode))) namedErrorCatching('perameter error', 'zipcode is not a Number');
-    if (!tobe.minMax(fname, 3, 15)) namedErrorCatching('perameter error', 'fname should be min 5 and max 12');
-    if (!tobe.minMax(lname, 3, 15)) namedErrorCatching('perameter error', 'lname should be min 5 and max 12');
-    if (!validate.isEmail(email)) namedErrorCatching('perameter error', 'email is not a email');
-    if (!tobe.minMax(city, 3, 15)) namedErrorCatching('perameter error', 'city should be min 5 and max 12');
-    if (!tobe.minMax(country, 3, 15)) namedErrorCatching('perameter error', 'country should be min 5 and max 12');
-    if (!tobe.minMax(district, 3, 15)) namedErrorCatching('perameter error', 'district should be min 5 and max 12');
-    if (!tobe.minMax(road_no, 3, 15)) namedErrorCatching('perameter error', 'road_no should be min 5 and max 12');
-    if (!tobe.minMax(district, 3, 15)) namedErrorCatching('perameter error', 'district should be min 5 and max 12');
-    if (!tobe.max(notes, 2000)) namedErrorCatching('perameter error', "notes can not be bigger than 2000 charecters");
-    [fname, lname, country, city, district, notes, road_no] = repleCrAll([fname, lname, country, city, district, notes, road_no]);
-
-    return ({
-        buyer:{
-            id:req.user_info._id,
-            email :req.user_info.email,
-            phone :String(req.user_info.phone)
-        } ,
-        reciever_address :{
-            country: country,
-            district:district,
-            city: city,
-            street:road_no,
-            postcode:zipcode
-        },
-        reciever :{
-            name :`${fname} ${lname}`,
-            phone : String(number),
-            email :email
-        },
-        reciever_notes :notes
-    });
-}
-
-function giveProductData(req) {
-    let items=req.body.items, total_product_price =0;
-    if (validate.isNotA.array(items)) namedErrorCatching('perameter error', 'items is not a Array');
-    for (let i = 0; i < items.length; i++) {
-        if (validate.isNotA.object(items[i])) namedErrorCatching('perameter error' , 'items['+i+'] is not a object');
-        log(typeof items[i]._id);
-        if (validate.isEmty(items[i]._id) || validate.isNotA.string(items[i]._id)) throw namedErrorCatching('perameter error' , `_id is emty or not a string in items array index no ${i}`);
-        if (validate.isEmty(items[i].item_name) || validate.isNotA.string(items[i].item_name)) throw namedErrorCatching('perameter error' , `item_name is emty or not a string in items array index no ${i}`);
-        if (validate.isEmty(items[i].size) || validate.isNotA.string(items[i].size)) throw namedErrorCatching('perameter error' , `item_name is emty or not a string in items array index no ${i}`);
-        if (validate.isNotA.num(items[i].quantity)) throw namedErrorCatching('perameter error' , `quantity is not a number in items array index no ${i}`);
-        if (validate.isNotA.num(items[i].per_price)) throw namedErrorCatching('perameter error' , `per_price is not a number in items array index no ${i}`);
-        total_product_price =items[i].quantity*items[i].per_price;
-        items[i].total_price = total_product_price;
-    }
-    return ({
-        shiping_items :items,
-        amountData : {
-            total_product_price: String(total_product_price)
+app.put('/activate',async function (req, res) {
+    try {
+        let {shipping_cost,id}=req.body;
+        if (validate.isEmty(id)) namedErrorCatching('perameter error' , 'id is emty ');
+        if (validate.isEmty(shipping_cost)) namedErrorCatching('perameter error' , 'shipping_cost is emty ');
+        if (!validate.isNum(shipping_cost)   ) namedErrorCatching('perameter error' ,'shipping cost is not a number' );
+        if (!validate.isNum(id)) namedErrorCatching('perameter error' , 'id us not a number');
+        let order=await Orders.findOne({id});
+        if (validate.isNull(order) ) {
+            return res.status(400).json({
+                error :{
+                    type :"notFound",
+                    message :"No data was found of order , please try again"
+                }
+            })
         }
-    })
+        order.adminApproved?.activationTime=new Date();
+        order.adminApproved?.status=true;
+        order.amountData?.shipping_cost=String(shipping_cost);
+        order.amountData?.total =shipping_cost+Number(order.amountData?.total_product_price);
+        order.order_status='approved'
+        await order.save();
+        return res.sendStatus(200);
+    } catch (error) {
+        catchError(res,error)
+    }
+})
 
-}
+
+app.get('/order/paypal', function (req,res) {
+    
+});
+
+
 
 app.listen(3000, () =>log('alhamdulillah , server working...'));

@@ -115,7 +115,7 @@ const
     },
     adminApproved ={
         activationTime :{
-            type :String,
+            type :Date,
         },
         status : {
             type :Boolean ,
