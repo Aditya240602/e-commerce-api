@@ -1,5 +1,6 @@
 
 import mongoose from 'mongoose';
+import { type } from 'os';
 
 const
     extraDatas = {
@@ -111,6 +112,31 @@ const
             type: String,
             required: true
         }
+    },
+    adminApproved ={
+        activationTime :{
+            type :String,
+        },
+        status : {
+            type :Boolean ,
+            default :false,
+        }
+    },
+    paymentInfo ={
+        payment_method : {
+            type :String,
+            default :'none'
+        },
+        paypal_token :String,
+        string_token :String,
+        payment_done_date :{
+            type :Date,
+            default :Date.now
+        },
+        payment_status : {
+            type :Boolean,
+            default: false
+        }
     };
 
 
@@ -130,6 +156,8 @@ const schema = new mongoose.Schema({
     reciever_address :reciever_address,
     shiping_items:shiping_items,
     amountData :amountData,
+    adminApproved :adminApproved,
+    paymentInfo:paymentInfo, 
     ...extraDatas
 });
 

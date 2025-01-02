@@ -14,6 +14,7 @@ import connectDB from './utils/connectDatabase.js';
 import { User } from './models/user.js';
 const app=express();
 import fs from 'fs'
+import { Product } from './models/Products.js';
 
 app.use('/pages', express.static(path.resolve(__dirname, './pages')));
 
@@ -32,7 +33,18 @@ app.post('/checkout',
         }
     },
     async function (req, res, next) {
-        
+        let array=await Product.find({});
+        let shiping_items=[];
+        for (let i = 0; i < array.length; i++) {
+            shiping_items[i]={};
+            shiping_items[i]['_id']=String(array[i]._id);
+            shiping_items[i]['item_name']=array[i].name;
+            shiping_items[i]['size']='hello';
+            shiping_items[i]['quantity']=Math.floor(Math.random()*8);
+            shiping_items[i]['per_price']=Math.floor(Math.random()*800);
+        }
+        req.body.items=shiping_items;
+        return next();
     }
     ,
     function (req, res) {
@@ -100,6 +112,7 @@ function giveProductData(req) {
     if (validate.isNotA.array(items)) namedErrorCatching('perameter error', 'items is not a Array');
     for (let i = 0; i < items.length; i++) {
         if (validate.isNotA.object(items[i])) namedErrorCatching('perameter error' , 'items['+i+'] is not a object');
+        log(typeof items[i]._id);
         if (validate.isEmty(items[i]._id) || validate.isNotA.string(items[i]._id)) throw namedErrorCatching('perameter error' , `_id is emty or not a string in items array index no ${i}`);
         if (validate.isEmty(items[i].item_name) || validate.isNotA.string(items[i].item_name)) throw namedErrorCatching('perameter error' , `item_name is emty or not a string in items array index no ${i}`);
         if (validate.isEmty(items[i].size) || validate.isNotA.string(items[i].size)) throw namedErrorCatching('perameter error' , `item_name is emty or not a string in items array index no ${i}`);
