@@ -3,6 +3,8 @@
 InshaAllah, By his marcy I will Gain Success 
 */
 
+import { log, repleCrAll, tobe, validate } from "string-player";
+
 export class checkout {
     constructor(parameters) {   
     }
@@ -63,7 +65,6 @@ export class checkout {
                 total_product_price: String(total_product_price)
             }
         })
-    
     }
 }
 

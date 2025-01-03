@@ -20,10 +20,10 @@ let schema = new mongoose.Schema({
     },
     date_of_birth:String,
     age :Number,
-    gender :{type :
-        String,
-        required:true,
-        default :'male'
+    gender: {
+        type:String,
+        required: true,
+        default: 'male'
     },
     first_name:{
         type :String,

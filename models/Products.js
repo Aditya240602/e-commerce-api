@@ -11,36 +11,28 @@ import mongoose from 'mongoose';
 const productschema = new mongoose.Schema({
   id: {
     type: Number,
-    required: true
+    unique: true,
+    default: () => Math.floor((Date.now() + Date.now()) * (Math.random() * 1000))
   },
   name: {
     type: String,
-    required: true
   },
   description: {
     type: String,
-    required: true
   },
   cetegory: {
     type: String,
-    required: true
   },
   thumb: {
     type: String,
-    required: true
+    default: "https://"
   },
   images: [String],
   date: {
     type: String,
-    required: true,
-  },
-  selling_country: {
-    type: String,
-    required: true,
   },
   selling_style: {
     type: String,
-    required: true,
   },
   price: {
     type: String,
@@ -50,8 +42,6 @@ const productschema = new mongoose.Schema({
     price: String,//price in usd
   }],
   size: String,
-  delivery_charge_in_india: Number,
-  delivery_charge_in_canada: Number,
 });
 
 export const Product = mongoose.model('products', productschema); 

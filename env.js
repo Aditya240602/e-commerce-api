@@ -12,3 +12,8 @@ config();
 export const DATABASE=process.env.DATABASE;
 export const require=createRequire(import.meta.url);
 export const __dirname=path.dirname(fileURLToPath(import.meta.url));
+export const T_PAYPAL_CLIENT_ID=process.env.T_PAYPAL_CLIENT_ID;
+export const T_PAYPAL_SECRET=process.env.T_PAYPAL_SECRET;
+export const PAYPAL_LINK=process.env.PAYPAL_LINK;
+export const BASE_URL=process.env.BASE_URL;
+export const T_STRIPE_KEY=process.env.T_STRIPE_KEY;

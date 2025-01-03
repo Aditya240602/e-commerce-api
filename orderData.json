@@ -1,0 +1,56 @@
+{
+    "buyer": {
+        "id": "67775687288eba1eb90a899e",
+        "email": "mubtasimf443@gmail.com",
+        "phone": "8801750147694"
+    },
+    "reciever": {
+        "name": "mubtasim fuad fuad",
+        "phone": "01750147694",
+        "email": "mubtasimf443@gmail.com"
+    },
+    "reciever_address": {
+        "country": "bangladesh",
+        "district": "chittagong",
+        "city": "anoware",
+        "street": "moulovi bari",
+        "postcode": 112311
+    },
+    "shiping_items": [
+        {
+            "_id": "67775c1a354896b280c0d6ad",
+            "item_name": "test product name4612",
+            "quantity": 3,
+            "per_price": 206,
+            "size": "hello",
+            "total_price": 618
+        },
+        {
+            "_id": "67775c5f34cf22a392ae1c2f",
+            "item_name": "test product name5503",
+            "quantity": 0,
+            "per_price": 631,
+            "size": "hello",
+            "total_price": 0
+        }
+    ],
+    "amountData": {
+        "total_product_price": "0"
+    },
+    "adminApproved": {
+        "status": false
+    },
+    "paymentInfo": {
+        "payment_method": "none",
+        "payment_status": false,
+        "payment_done_date": "2025-01-03T03:41:48.536Z"
+    },
+    "order_status": "pending",
+    "isCancelled": false,
+    "activated": false,
+    "trash": false,
+    "reciever_notes": "Ok , please send me this on time",
+    "_id": "67775c7c34cf22a392ae1c36",
+    "id": 1735875708534,
+    "date": "Fri Jan 03 2025 09:41:48 GMT+0600 (Bangladesh Standard Time)"
+}
