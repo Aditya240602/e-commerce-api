@@ -1,19 +1,41 @@
+import dotenv from 'dotenv';
+import { fileURLToPath } from 'url';
+import path from 'path';
 
-/*
-بِسْمِ اللهِ الرَّحْمٰنِ الرَّحِيْمِ  ﷺ  
-InshaAllah, By his marcy I will Gain Success 
-*/
-import { createRequire } from "module";
-import path from "path";
-import { fileURLToPath } from "url";
-import { config } from "dotenv";
-config();
+dotenv.config();
 
-export const DATABASE=process.env.DATABASE;
-export const require=createRequire(import.meta.url);
-export const __dirname=path.dirname(fileURLToPath(import.meta.url));
-export const T_PAYPAL_CLIENT_ID=process.env.T_PAYPAL_CLIENT_ID;
-export const T_PAYPAL_SECRET=process.env.T_PAYPAL_SECRET;
-export const PAYPAL_LINK=process.env.PAYPAL_LINK;
-export const BASE_URL=process.env.BASE_URL;
-export const T_STRIPE_KEY=process.env.T_STRIPE_KEY;
+// ESM has no built-in __dirname (that's a CommonJS global), so it's
+// reconstructed here from import.meta.url and exported for index.js to use.
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+
+const {
+    MONGODB_URI,
+    JWT_SECRET,
+    BASE_URL,
+    PORT,
+    T_PAYPAL_CLIENT_ID,
+    T_PAYPAL_SECRET,
+    STRIPE_SECRET_KEY
+} = process.env;
+
+// Fail fast and loudly if critical env vars are missing, instead of
+// letting the app start in a broken state and fail confusingly later.
+const required = { MONGODB_URI, JWT_SECRET, BASE_URL };
+for (const [key, value] of Object.entries(required)) {
+    if (!value) {
+        console.error(`Missing required environment variable: ${key}. Check your .env file.`);
+        process.exit(1);
+    }
+}
+
+export {
+    __dirname,
+    MONGODB_URI,
+    JWT_SECRET,
+    BASE_URL,
+    PORT,
+    T_PAYPAL_CLIENT_ID,
+    T_PAYPAL_SECRET,
+    STRIPE_SECRET_KEY
+};

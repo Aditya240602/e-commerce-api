@@ -1,8 +1,3 @@
-/*
-بِسْمِ اللهِ الرَّحْمٰنِ الرَّحِيْمِ  ﷺ  Insha Allah 
-By his marcy,  I will gain success
-*/
-
 
 import mongoose from 'mongoose';
 
