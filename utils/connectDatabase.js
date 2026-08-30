@@ -1,11 +1,8 @@
 
-/*
-بِسْمِ اللهِ الرَّحْمٰنِ الرَّحِيْمِ  ﷺ  
-InshaAllah, By his marcy I will Gain Success 
-*/
+
 
 import mongoose from "mongoose";
-import { DATABASE } from "../env.js";
+import { MONGODB_URI } from "../env.js";
 import { log } from "string-player";
 
 export default async function connectDB() {

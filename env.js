@@ -16,7 +16,8 @@ const {
     PORT,
     T_PAYPAL_CLIENT_ID,
     T_PAYPAL_SECRET,
-    STRIPE_SECRET_KEY
+    STRIPE_SECRET_KEY,
+    PAYPAL_LINK
 } = process.env;
 
 // Fail fast and loudly if critical env vars are missing, instead of
@@ -37,5 +38,6 @@ export {
     PORT,
     T_PAYPAL_CLIENT_ID,
     T_PAYPAL_SECRET,
-    STRIPE_SECRET_KEY
+    STRIPE_SECRET_KEY,
+    PAYPAL_LINK
 };
