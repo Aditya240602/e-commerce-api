@@ -26,7 +26,21 @@ export const loginSchema = z.object({
     email: z.string().email('a valid email is required'),
     password: z.string().min(1, 'password is required')
 });
-
+export const createProductSchema = z.object({
+    name: z.string().min(1, 'name is required'),
+    description: z.string().optional(),
+    cetegory: z.string().optional(),
+    thumb: z.string().optional(),
+    images: z.array(z.string()).optional(),
+    date: z.string().optional(),
+    selling_style: z.string().optional(),
+    price: z.string().min(1, 'price is required'), // stored as String per your schema
+    size_and_price: z.array(z.object({
+        size: z.string(),
+        price: z.string()
+    })).optional(),
+    size: z.string().optional()
+});
 export const addToCartSchema = z.object({
     productId: z.string().min(1, 'productId is required'),
     quantity: z.coerce.number().int().min(1).default(1)

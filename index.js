@@ -12,6 +12,9 @@ import { requireAuth, requireAdmin } from './middleware/auth.js';
 import authRoutes from './routes/auth.js';
 import cartRoutes from './routes/cart.js';
 import { activateOrderSchema, validateBody } from './utils/validation.js';
+import productRoutes from './routes/products.js';
+// ...
+app.use('/products', productRoutes);
 
 const app = express();
 

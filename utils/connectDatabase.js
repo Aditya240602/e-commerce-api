@@ -7,7 +7,7 @@ import { log } from "string-player";
 
 export default async function connectDB() {
     try {
-        await mongoose.connect(DATABASE);
+        await mongoose.connect(MONGODB_URI);
         log('database connected...')
     } catch (error) {
         console.error(error);
