@@ -1,7 +1,4 @@
-
 import mongoose from 'mongoose';
-
-
 
 const productschema = new mongoose.Schema({
   id: {
@@ -39,4 +36,7 @@ const productschema = new mongoose.Schema({
   size: String,
 });
 
-export const Product = mongoose.model('products', productschema); 
+productschema.index({ cetegory: 1 });
+productschema.index({ name: 'text' });
+
+export const Product = mongoose.model('products', productschema);

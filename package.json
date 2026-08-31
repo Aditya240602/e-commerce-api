@@ -3,8 +3,7 @@
   "version": "1.0.0",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
-    "dev": "nodemon index.js"
+    "test": "node --experimental-vm-modules node_modules/jest/bin/jest.js"
   },
   "keywords": [],
   "author": "",
@@ -14,14 +13,22 @@
     "axios": "^1.7.9",
     "bcrypt": "^6.0.0",
     "bcryptjs": "^3.0.3",
+    "compression": "^1.8.1",
+    "cors": "^2.8.6",
     "dotenv": "^16.6.1",
     "express": "^4.21.2",
     "jsonwebtoken": "^9.0.3",
     "mongoose": "^8.9.3",
+    "node-cache": "^5.1.2",
     "node-fetch": "^3.3.2",
     "string-player": "^1.1.7",
     "stripe": "^17.5.0",
     "zod": "^4.5.4"
   },
-  "type": "module"
+  "type": "module",
+  "devDependencies": {
+    "autocannon": "^8.0.0",
+    "jest": "^30.5.0",
+    "supertest": "^7.2.2"
+  }
 }

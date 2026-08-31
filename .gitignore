@@ -1,5 +1,6 @@
 # Environment variables — NEVER commit this, it contains real secrets
 .env
+env.js
 
 # Dependencies
 node_modules/

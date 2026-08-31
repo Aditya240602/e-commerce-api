@@ -3,12 +3,10 @@ import { Product } from '../models/Products.js';
 import { requireAuth, requireAdmin } from '../middleware/auth.js';
 import catchError from '../utils/catcherror.js';
 import { createProductSchema, validateBody } from '../utils/validation.js';
+import NodeCache from 'node-cache';
 
 const router = express.Router();
 
-/**
- * POST /products - create a new product (admin only)
- */
 router.post('/', requireAuth, requireAdmin, express.json(), async function (req, res) {
     try {
         const body = validateBody(createProductSchema, req.body, res);
@@ -20,23 +18,25 @@ router.post('/', requireAuth, requireAdmin, express.json(), async function (req,
         catchError(res, error);
     }
 });
-
-/**
- * GET /products - list all products (public)
- * Handy for grabbing a real _id to use when testing the cart.
- */
+const cache = new NodeCache({ stdTTL: 60 });
 router.get('/', async function (req, res) {
     try {
-        const products = await Product.find();
-        return res.status(200).json({ products });
+        const page = parseInt(req.query.page) || 1;
+        const limit = parseInt(req.query.limit) || 20;
+        const cacheKey = `products:${page}:${limit}`;
+
+        const cached = cache.get(cacheKey);
+        if (cached) return res.status(200).json(cached);
+
+        const products = await Product.find().lean().skip((page - 1) * limit).limit(limit);
+        const result = { products, page, limit };
+        cache.set(cacheKey, result);
+        return res.status(200).json(result);
     } catch (error) {
         catchError(res, error);
     }
 });
 
-/**
- * GET /products/:id - get one product by its Mongo _id
- */
 router.get('/:id', async function (req, res) {
     try {
         const product = await Product.findById(req.params.id);
