@@ -19,3 +19,4 @@ Thumbs.db
 
 # Leftover file-based "database" from the old version of this project
 orderData.json
+scripts/products.json

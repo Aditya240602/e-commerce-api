@@ -41,6 +41,21 @@ export const createProductSchema = z.object({
     })).optional(),
     size: z.string().optional()
 });
+
+/**
+ * PATCH /products/:id
+ * Same field set as createProductSchema, but every field is optional since
+ * this is a partial update — the admin might only want to change the price,
+ * or only the thumb, etc. `.partial()` on its own would still accept an
+ * empty object ({}), so `.refine` rejects a request that changes nothing —
+ * that's almost certainly a frontend bug, not a real intent to "update".
+ */
+export const updateProductSchema = createProductSchema
+    .partial()
+    .refine((data) => Object.keys(data).length > 0, {
+        message: 'at least one field must be provided to update'
+    });
+
 export const addToCartSchema = z.object({
     productId: z.string().min(1, 'productId is required'),
     quantity: z.coerce.number().int().min(1).default(1)
