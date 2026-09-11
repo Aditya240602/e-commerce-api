@@ -2,7 +2,7 @@ import autocannon from 'autocannon';
 
 autocannon({
     url: 'http://localhost:3000',
-    connections: 50,
+    connections: 900,
     duration: 20,
     requests: [
         { path: '/products?page=1' },
