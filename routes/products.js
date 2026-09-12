@@ -1,4 +1,5 @@
 import express from 'express';
+import zlib from 'node:zlib';
 import { Product } from '../models/Products.js';
 import { requireAuth, requireAdmin } from '../middleware/auth.js';
 import catchError from '../utils/catcherror.js';
@@ -36,19 +37,54 @@ router.post('/', requireAuth, requireAdmin, express.json(), async function (req,
     }
 });
 
+/**
+ * PERFORMANCE NOTE:
+ * The global `compression()` middleware in app.js gzips every response as
+ * it goes out — including cache hits. That means the same handful of
+ * cached JSON payloads were being re-gzipped on EVERY single request that
+ * hit them (thousands of times under load), even though the bytes never
+ * changed within the 60s TTL window. Gzip is CPU-bound, and on a single
+ * Node process that repeated work was the main thing capping throughput
+ * once traffic passed a few hundred concurrent connections.
+ *
+ * Fix: gzip the payload ONCE, right when it's computed, and cache both the
+ * plain JSON and the pre-gzipped buffer. Every cache hit afterward just
+ * writes the already-compressed bytes straight to the socket — no
+ * JSON.stringify, no gzip, on the hot path. Setting Content-Encoding
+ * ourselves also makes the `compression()` middleware skip this response
+ * (it never double-compresses a response that already declares an
+ * encoding), so we're not paying for compression twice.
+ */
 router.get('/', async function (req, res) {
     try {
         const page = parseInt(req.query.page) || 1;
         const limit = parseInt(req.query.limit) || 20;
         const cacheKey = `products:${page}:${limit}`;
+        const acceptsGzip = (req.headers['accept-encoding'] || '').includes('gzip');
 
         const cached = cache.get(cacheKey);
-        if (cached) return res.status(200).json(cached);
+        if (cached) {
+            res.set('Content-Type', 'application/json; charset=utf-8');
+            if (acceptsGzip) {
+                res.set('Content-Encoding', 'gzip');
+                return res.status(200).send(cached.gzip);
+            }
+            return res.status(200).send(cached.json);
+        }
 
         const products = await Product.find().lean().skip((page - 1) * limit).limit(limit);
         const result = { products, page, limit };
-        cache.set(cacheKey, result);
-        return res.status(200).json(result);
+
+        const json = JSON.stringify(result);
+        const gzip = zlib.gzipSync(json);
+        cache.set(cacheKey, { json, gzip });
+
+        res.set('Content-Type', 'application/json; charset=utf-8');
+        if (acceptsGzip) {
+            res.set('Content-Encoding', 'gzip');
+            return res.status(200).send(gzip);
+        }
+        return res.status(200).send(json);
     } catch (error) {
         catchError(res, error);
     }
